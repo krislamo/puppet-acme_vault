@@ -7,6 +7,7 @@ class acme_vault::common (
     $home_dir           = $::acme_vault::params::home_dir,
     $contact_email      = $::acme_vault::params::contact_email,
     $domains            = $::acme_vault::params::domains,
+    $overrides          = $::acme_vault::params::overrides,
 
     $vault_token        = $::acme_vault::params::vault_token,
     $vault_addr         = $::acme_vault::params::vault_addr,

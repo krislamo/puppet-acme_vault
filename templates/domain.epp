@@ -7,13 +7,32 @@
 --staging \
 --server <%= $staging_url %> \
 <% } else { -%>
---server <%= $prod_url %>
+--server <%= $prod_url %> \
 <% } -%>
 --dns dns_lexicon \
---dnssleep 600 \
---domain "<%= $domain %>" \
-<% $domains.each |$d| { -%>
---domain "<%= $d %>" \
+--dnssleep 1800 \
+--domain "<%= $domain %>" --challenge-alias <%= "$domain" %> \
+<% $domains.each |$d| {
+    # this uses the challenge-alias override if specified, otherwise
+    # uses the sld.tld of the given domain
+    if $overrides[$d] {
+        $ca = $overrides[$d]
+    }
+    else {
+        # we need to calculate the challenge-alias
+        $ds = split($d, '[.]')
+
+        # we don't want to count the wildcard, so strip it off
+        if $ds[0] == "*" {
+            $clean = $ds[1, -1]
+        }
+        else {
+            $clean = $ds[0, -1]
+        }
+        $ca = join($clean, ".")
+    }
+    -%>
+--domain "<%= $d %>"  --challenge-alias <%= "${ca}" %> \
 <% } -%>
  > /dev/null && \
 <%= $acme_script %> \

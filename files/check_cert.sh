@@ -3,6 +3,10 @@
 # this script compares the existing cert against the new cert in vault, and
 # replaces existing cert only if it is newer and valid.
 
+# TODO serious refactoring to apply DRY 
+# TODO help / argument checking
+# TODO need a force flag - also something that checks if all things match
+
 # function defs
 get_fingerprint() {
     openssl x509 -noout -fingerprint -in <(echo "$1") | awk -F= '{print $2}'
@@ -15,13 +19,18 @@ get_enddate() {
 deploy_cert() {
     NEWCERT=$1
     NEWKEY=$2
-    EXISTING_CERT_PATH=$3
-    EXISTING_KEY_PATH=$4
+    NEWCHAIN=$3
+    NEWFULLCHAIN=$4
+    EXISTING_CERT_PATH=$5
+    EXISTING_KEY_PATH=$6
+    EXISTING_CHAIN_PATH=$7
+    EXISTING_FULLCHAIN_PATH=$8
     
     echo "deploying cert to $EXISTING_CERT_PATH"
-    #mkdir $EXISTING_CERT_DIR || true  #TODO MOVE
     echo "$NEWCERT" > $EXISTING_CERT_PATH
     echo "$NEWKEY"  > $EXISTING_KEY_PATH
+    echo "$NEWCHAIN"  > $EXISTING_CHAIN_PATH
+    echo "$NEWFULLCHAIN"  > $EXISTING_FULLCHAIN_PATH
 
 }
 
@@ -31,6 +40,8 @@ CERT_PREFIX=$2
 EXISTING_CERT_DIR="${CERT_PREFIX}/${DOMAIN}"
 EXISTING_CERT_PATH="${EXISTING_CERT_DIR}/cert.pem"
 EXISTING_KEY_PATH="${EXISTING_CERT_DIR}/cert.key"
+EXISTING_CHAIN_PATH="${EXISTING_CERT_DIR}/chain.pem"
+EXISTING_FULLCHAIN_PATH="${EXISTING_CERT_DIR}/fullchain.pem"
 
 # variables
 ONE_WEEK=604800
@@ -39,10 +50,14 @@ TODAY=$(date --iso-8601)
 
 NEWCERT_VAULT_PATH="/secret/letsencrypt/${DOMAIN}/cert.pem"
 NEWKEY_VAULT_PATH="/secret/letsencrypt/${DOMAIN}/cert.key"
+NEWCHAIN_VAULT_PATH="/secret/letsencrypt/${DOMAIN}/chain.pem"
+NEWFULLCHAIN_VAULT_PATH="/secret/letsencrypt/${DOMAIN}/fullchain.pem"
 
 # Get new cert info
 NEWCERT=$(vault read -field=value $NEWCERT_VAULT_PATH) || exit -1
 NEWKEY=$(vault read -field=value $NEWKEY_VAULT_PATH) || exit -1
+NEWCHAIN=$(vault read -field=value $NEWCHAIN_VAULT_PATH) || exit -1
+NEWFULLCHAIN=$(vault read -field=value $NEWFULLCHAIN_VAULT_PATH) || exit -1
 NEWCERT_FINGERPRINT=$(get_fingerprint "$NEWCERT")
 NEWCERT_ENDDATE=$(get_enddate "$NEWCERT")
 
@@ -70,7 +85,7 @@ else
     then 
         mkdir -p $EXISTING_CERT_DIR
     fi
-    deploy_cert "$NEWCERT" "$NEWKEY" "$EXISTING_CERT_PATH" "$EXISTING_KEY_PATH"
+    deploy_cert "$NEWCERT" "$NEWKEY" "$NEWCHAIN" "$NEWFULLCHAIN" "$EXISTING_CERT_PATH" "$EXISTING_KEY_PATH" "$EXISTING_CHAIN_PATH" "$EXISTING_FULLCHAIN_PATH"
     exit 0
 fi
 
@@ -101,7 +116,7 @@ fi
 
 # if we made it this far, the cert looks good, replace it
 
-deploy_cert "$NEWCERT" "$NEWKEY" "$EXISTING_CERT_PATH" "$EXISTING_KEY_PATH"
+deploy_cert "$NEWCERT" "$NEWKEY" "$NEWCHAIN" "$NEWFULLCHAIN" "$EXISTING_CERT_PATH" "$EXISTING_KEY_PATH" "$EXISTING_CHAIN_PATH" "$EXISTING_FULLCHAIN_PATH"
 
 
 

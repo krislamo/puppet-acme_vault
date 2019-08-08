@@ -7,6 +7,7 @@ class acme_vault::request (
     $home_dir           = $::acme_vault::common::home_dir,
     $contact_email      = $::acme_vault::common::contact_email,
     $domains            = $::acme_vault::common::domains,
+    $overrides          = $::acme_vault::common::overrides,
 
     $staging            = $::acme_vault::params::staging,
     $staging_url        = $::acme_vault::params::staging_url,
@@ -87,6 +88,7 @@ END
           staging     => $staging,
           staging_url => $staging_url,
           prod_url    => $prod_url,
+          overrides   => $overrides,
           }
         )
       }

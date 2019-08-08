@@ -6,6 +6,9 @@ class acme_vault::params {
     $home_dir   = '/home/acme_vault'
     $contact_email = ''
     $domains     = undef
+    # overrides is a list of challenge-alias overrides.  It defaults to the domain itself.
+    # see https://github.com/Neilpang/acme.sh/wiki/DNS-alias-mode
+    $overrides   = {}
 
     # authentication
     $vault_token = undef
