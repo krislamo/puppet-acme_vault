@@ -18,7 +18,7 @@ This module uses [acme.sh](https://github.com/Neilpang/acme.sh) to request
 letsencrypt certificates using the DNS-01 challenge.  Once valid certificates
 are recieved, they are stored in [Hashicorp
 vault](https://www.vaultproject.io/) where they can be retrieved by any
-appropriate machine.  
+appropriate machine.
 
 This module consists of a common class, a request class, and a deploy class.
 The request class is intended to be enabled on a single machine that will
@@ -36,11 +36,11 @@ python library is also included.  Both are installed via pip.
 
 This module also assumes a working installation of vault.
 
-### Beginning with acme_vault  
+### Beginning with acme_vault
 
 Just include the appropriate modules for the appropriate machines, and make
 sure the required values are provided via hiera or class.  Note: the common
-module must be included before either.  
+module must be included before either.
 
 Typically this would involve a profile like:
 
@@ -76,13 +76,13 @@ vault, vault vars, and cron mailto are needed for both request and deploy
 
 ##### `user`
 
-user to be created to request/deploy certs 
+user to be created to request/deploy certs
 
 Default value: `acme_vault`
 
 ##### `group`
 
-group that the user belongs to.  For deploy, this should probably be the webserver group 
+group that the user belongs to.  For deploy, this should probably be the webserver group
 
 Default value: `acme_vault`
 
@@ -102,7 +102,7 @@ Default value: `''`
 
 mapping of domains to be included in the cert.  The key is the "main" domain,
 and the value is the list of extra names to be requested.  Both the main domain
-and the list of domains are included. 
+and the list of domains are included.
 
 REQUIRED
 
@@ -128,7 +128,7 @@ Default value: `${home_dir}/vault"`
 
 #### `vault_prefix`
 
-The path within vault where the certificates will be stored and retrieved. 
+The path within vault where the certificates will be stored and retrieved.
 
 Default value: `/secret/letsencrypt/`
 
@@ -147,13 +147,13 @@ can be triggered by running the cron job manually as needed.
 
 ##### `user`
 
-user to be created to request/deploy certs 
+user to be created to request/deploy certs
 
 Default value: `acme_vault`
 
 ##### `group`
 
-group that the user belongs to.  For deploy, this should probably be the webserver group 
+group that the user belongs to.  For deploy, this should probably be the webserver group
 
 Default value: `acme_vault`
 
@@ -173,7 +173,7 @@ Default value: `''`
 
 mapping of domains to be included in the cert.  The key is the "main" domain,
 and the value is the list of extra names to be requested.  Both the main domain
-and the list of domains are included. 
+and the list of domains are included.
 
 REQUIRED
 
@@ -202,37 +202,37 @@ Default value: `https://acme-v02.api.letsencrypt.org/directory`
 
 #### `acme_revision`
 
-git revision/tag to be used to checkout acme.sh repository.  
+git revision/tag to be used to checkout acme.sh repository.
 
 Default value: `HEAD`
 
 #### `acme_repo_path`
 
-where the repo should be checked out.  
+where the repo should be checked out.
 
 Default value: `$home_dir/acme.sh`
 
 #### `acme_script`
 
-path the the acme.sh script itself  
+path the the acme.sh script itself
 
 Default value: `$acme_repo_path/acme.sh`
 
 #### `lexicon_provider`
 
-provider for lexicon to use for dns-01 challanges.  
+provider for lexicon to use for dns-01 challanges.
 
 REQUIRED
 
 #### `lexicon_username`
 
-username for lexicon dns.  
+username for lexicon dns.
 
 REQUIRED
 
 #### `lexicon_token`
 
-token for lexicon user.  
+token for lexicon user.
 
 REQUIRED
 
@@ -249,13 +249,13 @@ is appropriate to replace the existing one
 
 ##### `user`
 
-user to be created to request/deploy certs 
+user to be created to request/deploy certs
 
 Default value: `acme_vault`
 
 ##### `group`
 
-group that the user belongs to.  For deploy, this should probably be the webserver group 
+group that the user belongs to.  For deploy, this should probably be the webserver group
 
 Default value: `acme_vault`
 
@@ -269,31 +269,31 @@ Default value: `/home/$user`
 
 mapping of domains to be included in the cert.  The key is the "main" domain,
 and the value is the list of extra names to be requested.  Both the main domain
-and the list of domains are included. 
+and the list of domains are included.
 
 REQUIRED
 
-#### Parameters only for deploy: 
+#### Parameters only for deploy:
 
 ##### `cert_destination_path`
 
-where the cert should be deployed to.  cert will end up in $cert_destination_path/$domain/.  
+where the cert should be deployed to.  cert will end up in $cert_destination_path/$domain/.
 
-Default value: `/etc/acme-vault`
+Default value: `/etc/acme`
 
-##### `restart`
+##### `deploy_scripts`
 
-indicates if cron should include a restart after cert is deployed
+location for arbitrary scripts to reload certificates for applications. scripts will end up in $cert_destination_path/deploy.d/
 
-Valid values: `true` `false`
+Default value: `/etc/acme/deploy.d`
 
-##### `restart_command`
+##### `restart_method`
 
-The command used restart any service after cert is deployed
+shell that is run after successful deployment. runs scripts in $deploy_scripts
 
-Default value: `'echo restart!'`
+Default value: `for f in /etc/acme/deploy.d/*.sh; do "$f"; done`
 
- 
+
 ## Limitations
 
 Has only been tested on Centos 7
