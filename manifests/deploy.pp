@@ -8,8 +8,8 @@ class acme_vault::deploy(
     $domains               = $::acme_vault::common::domains,
 
     $cert_destination_path = $::acme_vault::params::cert_destination_path,
-    $restart               = $::acme_vault::params::restart,
-    $restart_command       = $::acme_vault::params::restart_command,
+    $deploy_scripts        = $::acme_vault::params::deploy_scripts,
+    $restart_method        = $::acme_vault::params::restart_method,
 
 ) inherits acme_vault::params {
   include acme_vault::common
@@ -23,25 +23,18 @@ class acme_vault::deploy(
     source => 'puppet:///modules/acme_vault/check_cert.sh',
   }
 
-  # ensure destination path exists
-  file {$cert_destination_path:
+  # ensure destination paths exist
+  file {[$cert_destination_path, $deploy_scripts]:
     ensure => directory,
     owner  => $user,
     group  => $group,
     mode   => '0750',
   }
 
-  # cron job for deploy
-  if $restart {
-    $restart_suffix = "&& ${restart_command}"
-  } else {
-    $restart_suffix = ''
-  }
-
   # go through each domain, setup cron, and ensure the destination dir exists
   $domains.each |$domain, $d_list| {
     cron { "${domain}_deploy":
-      command => ". \$HOME/.bashrc && ${home_dir}/check_cert.sh ${domain} ${cert_destination_path} ${restart_suffix}",
+      command => ". \$HOME/.bashrc && ${home_dir}/check_cert.sh ${domain} ${cert_destination_path} && ${restart_method}",
       user    => $user,
       weekday => 2,
       hour    => 11,

@@ -26,16 +26,13 @@ class acme_vault::params {
     $acme_repo_path = "${home_dir}/acme.sh"
     $acme_script    = "${acme_repo_path}/acme.sh"
 
-    # lexicon 
-    $lexicon_provider   = undef 
-    $lexicon_username   = undef 
-    $lexicon_token      = undef 
+    # lexicon
+    $lexicon_provider   = undef
+    $lexicon_username   = undef
+    $lexicon_token      = undef
 
     # settings for deploy
-
-    $cert_destination_path = '/etc/acme/'
-
-    $restart         = false
-    $restart_command = 'echo restart!'
-
+    $cert_destination_path = '/etc/acme'
+    $deploy_scripts        = "${cert_destination_path}/deploy.d"
+    $restart_method        = "for f in ${deploy_scripts}/*.sh; do \"\$f\"; done"
 }
