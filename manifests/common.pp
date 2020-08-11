@@ -1,5 +1,5 @@
 # Common configuration for acme_vault
-# 
+#
 
 class acme_vault::common (
     $user               = $::acme_vault::params::user,
@@ -17,12 +17,13 @@ class acme_vault::common (
 ) inherits acme_vault::params {
 
     $common_bashrc_template = @(END)
-export PATH=$HOME:$PATH
-export VAULT_BIN=<%= @vault_bin %>
-export VAULT_TOKEN=<%= @vault_token %>
-export VAULT_ADDR=<%= @vault_addr %>
-export VAULT_PREFIX=<%= @vault_prefix %>
-END
+    export PATH=$HOME:$PATH
+    export VAULT_BIN=<%= @vault_bin %>
+    export VAULT_TOKEN=<%= @vault_token %>
+    export VAULT_ADDR=<%= @vault_addr %>
+    export VAULT_PREFIX=<%= @vault_prefix %>
+    | END
+
     # create acme_vault user
     user { $user:
       ensure     => present,
